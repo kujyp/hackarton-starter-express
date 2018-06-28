@@ -1,0 +1,24 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:9.6.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: docker build -t hackathon-starter-express .
+      - run:
+         name: docker push
+         command: |
+           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+           docker tag hackathon-starter-express $DOCKER_USER/hackathon-starter-express:${CIRCLE_SHA1:0:4}
+           docker push $DOCKER_USER/hackathon-starter-express
